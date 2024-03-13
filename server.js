@@ -10,7 +10,7 @@ async function connect() {
     await client.connect();
 
     // Make the appropriate DB calls
-    const db = client.db('ArvoreDB');
+    const db = client.db('ARVORE');
     return db;
   } catch (err) {
     console.error(err);
