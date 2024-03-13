@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 
 async function connect() {
-  const url = 'mongodb+srv://juca1405:<password>@cluster0.5rumzet.mongodb.net/';
+  const url = 'mongodb+srv://juca1405:<e$$emP1_>@cluster0.5rumzet.mongodb.net/';
   const client = new MongoClient(url);
 
   try {
