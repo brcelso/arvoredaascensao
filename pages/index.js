@@ -1,36 +1,106 @@
-const express = require('express');
-const cors = require('cors');
+import { useCallback, useEffect, useState } from 'react';
 
-async function connect() {
-  const url = 'mongodb+srv://juca1405:<e$$emP1_>@cluster0.5rumzet.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
-  const client = new MongoClient(url);
+const colors = [
+  '#FF0000', // Vermelho
+  '#FFA500', // Laranja
+  '#FFFF00', // Amarelo
+  '#008000', // Verde
+  '#00FFFF', // Aqua
+  '#800080', // Roxo
+  '#FF69B4', // Rosa
+];
 
-  try {
-    // Connect to the MongoDB cluster
-    await client.connect();
+export default function Home() {
+  const [ballColors, setBallColors] = useState(Array(100).fill(colors[0]));
+  const [selectedPage, setSelectedPage] = useState('');
 
-    // Make the appropriate DB calls
-    const db = client.db('Cluster0');
-    return db;
-  } catch (err) {
-    console.error(err);
-  }
+  const handleBallClick = (index) => {
+    const nextColorIndex = (colors.indexOf(ballColors[index]) + 1) % colors.length;
+    const updatedColors = [...ballColors];
+    updatedColors[index] = colors[nextColorIndex];
+    setBallColors(updatedColors);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`${selectedPage}BallColors`, JSON.stringify(updatedColors));
+    }
+  };
+
+  const resetColors = () => {
+    const resetColors = Array(100).fill(colors[0]);
+    setBallColors(resetColors);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`${selectedPage}BallColors`, JSON.stringify(resetColors));
+    }
+  };
+
+  const handleSelectChange = (event) => {
+    setSelectedPage(event.target.value);
+    if (typeof window !== 'undefined') {
+      const storedColors = localStorage.getItem(`${event.target.value}BallColors`);
+      if (storedColors) {
+        setBallColors(JSON.parse(storedColors));
+      } else {
+        resetColors();
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedColors = localStorage.getItem(`${selectedPage}BallColors`);
+      if (storedColors) {
+        setBallColors(JSON.parse(storedColors));
+      }
+    }
+  }, [selectedPage]);
+
+  useEffect(() => {
+    if (selectedPage) {
+      fetch('http://localhost:5000/colors')
+        .then(response => response.json())
+        .then(data => setBallColors(data.colors));
+    }
+  }, [selectedPage]);
+
+  return (
+    <div style={{ backgroundColor: '#333', color: '#fff', fontFamily: 'Montserrat, sans-serif' }}>
+      <h1>Árvore da Vida</h1>
+      <button onClick={resetColors}>Resetar Cores</button>
+      <select value={selectedPage} onChange={handleSelectChange}>
+        <option value="">Selecione uma página</option>
+        <option value="page1">Página 1</option>
+        <option value="page2">Página 2</option>
+        <option value="page3">Página 3</option>
+        {/* Adicione mais opções conforme necessário */}
+      </select>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: '10px' }}>
+        {Array.from({ length: 100 }).map((_, index) => (
+          <div
+            key={index}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              borderRadius: '10px',
+              backgroundColor: 'black',
+              padding: '10px',
+              cursor: 'pointer',
+              border: '2px solid white',
+            }}
+            onClick={() => handleBallClick(index)}
+          >
+            <div
+              style={{
+                width: '50px',
+                height: '50px',
+                borderRadius: '50%',
+                backgroundColor: ballColors[index],
+              }}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
-
-const app = express();
-app.use(cors());
-
-app.get('/colors', async (req, res) => {
-  const db = await connect();
-  // Aqui você pode buscar as cores do banco de dados
-  // e retorná-las como uma resposta JSON
-  res.json({ colors: [] });
-});
-
-app.listen(5000, () => {
-  console.log('Servidor rodando na porta 5000');
-});
-
-
 
 
