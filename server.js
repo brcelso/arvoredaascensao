@@ -30,7 +30,3 @@ app.get('/colors', async (req, res) => {
 app.listen(5000, () => {
   console.log('Servidor rodando na porta 5000');
 });
-
-
-
-
