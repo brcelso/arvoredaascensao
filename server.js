@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 
 async function connect() {
-  const url = 'mongodb+srv://juca1405:<e$$emP1_>@cluster0.5rumzet.mongodb.net/';
+  const url = 'mongodb+srv://juca1405:e$$emP1_@cluster0.5rumzet.mongodb.net/';
   const client = new MongoClient(url);
 
   try {
@@ -10,7 +10,7 @@ async function connect() {
     await client.connect();
 
     // Make the appropriate DB calls
-    const db = client.db('Cluster0');
+    const db = client.db('ArvoreDB');
     return db;
   } catch (err) {
     console.error(err);
