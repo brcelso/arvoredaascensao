@@ -16,12 +16,13 @@ async function connect() {
     // Get the collection you want to create an index on
     const collection = db.collection('DB');
 
-    // Create an index on the 'color' field
-    collection.createIndex({ color: 1 });
+    // Create an index on the 'color' field and wait for it to be ready
+    await collection.createIndex({ color: 1 });
+    console.log('Index created');
 
     return { db, collection };
   } catch (err) {
-    console.error(err);
+    console.error('Error creating index', err);
   }
 }
 
