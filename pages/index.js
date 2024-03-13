@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+const { connect } = require('./db.js');
 
 const colors = [
   '#FF0000', // Vermelho
@@ -52,6 +53,14 @@ export default function Home() {
       }
     }
   }, [selectedPage]);
+
+  useEffect(() => {
+    async function fetchData() {
+      const db = await connect();
+      // Agora você pode usar 'db' para interagir com o banco de dados
+    }
+    fetchData();
+  }, []);
 
   return (
     <div style={{ backgroundColor: '#333', color: '#fff', fontFamily: 'Montserrat, sans-serif' }}>
