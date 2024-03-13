@@ -19,7 +19,7 @@ async function connect() {
     // Create an index on the 'color' field
     collection.createIndex({ color: 1 });
 
-    return db;
+    return { db, collection };
   } catch (err) {
     console.error(err);
   }
@@ -29,12 +29,12 @@ const app = express();
 app.use(cors());
 
 app.get('/colors', async (req, res) => {
-  const db = await connect();
-  // Aqui você pode buscar as cores do banco de dados
-  // e retorná-las como uma resposta JSON
-  res.json({ colors: [] });
+  const { db, collection } = await connect();
+  const colors = await collection.find().toArray();
+  res.json({ colors });
 });
 
 app.listen(5000, () => {
   console.log('Servidor rodando na porta 5000');
 });
+
