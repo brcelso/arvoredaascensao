@@ -1,71 +1,72 @@
-import { useCallback, useEffect, useState } from 'react'
-import Button from '../components/Button'
-import ClickCount from '../components/ClickCount'
-import styles from '../styles/home.module.css'
+import { useCallback, useEffect, useState } from 'react';
 
-function throwError() {
-  console.log(
-    // The function body() is not defined
-    document.body()
-  )
-}
+const colors = [
+  '#FF0000', // Vermelho
+  '#FFA500', // Laranja
+  '#FFFF00', // Amarelo
+  '#008000', // Verde
+  '#00FFFF', // Aqua
+  '#800080', // Roxo
+  '#FF69B4', // Rosa
+];
 
-function Home() {
-  const [count, setCount] = useState(0)
-  const increment = useCallback(() => {
-    setCount((v) => v + 1)
-  }, [setCount])
+export default function Home() {
+  const [ballColors, setBallColors] = useState(Array(100).fill(colors[0]));
+
+  const handleBallClick = (index) => {
+    const nextColorIndex = (colors.indexOf(ballColors[index]) + 1) % colors.length;
+    const updatedColors = [...ballColors];
+    updatedColors[index] = colors[nextColorIndex];
+    setBallColors(updatedColors);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('ballColors', JSON.stringify(updatedColors));
+    }
+  };
 
   useEffect(() => {
-    const r = setInterval(() => {
-      increment()
-    }, 1000)
-
-    return () => {
-      clearInterval(r)
+    if (typeof window !== 'undefined') {
+      const storedColors = localStorage.getItem('ballColors');
+      if (storedColors) {
+        setBallColors(JSON.parse(storedColors));
+      }
     }
-  }, [increment])
+  }, []);
 
   return (
-    <main className={styles.main}>
-      <h1>Fast Refresh Demo</h1>
-      <p>
-        Fast Refresh is a Next.js feature that gives you instantaneous feedback
-        on edits made to your React components, without ever losing component
-        state.
-      </p>
-      <hr className={styles.hr} />
-      <div>
-        <p>
-          Auto incrementing value. The counter won't reset after edits or if
-          there are errors.
-        </p>
-        <p>Current value: {count}</p>
+    <div style={{ backgroundColor: '#333', color: '#fff', fontFamily: 'Montserrat, sans-serif' }}>
+      <h1>Árvore da Vida</h1>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: '10px' }}>
+        {Array.from({ length: 100 }).map((_, index) => (
+          <div
+            key={index}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              borderRadius: '10px',
+              backgroundColor: 'black',
+              padding: '10px',
+              cursor: 'pointer',
+              border: '2px solid white',
+            }}
+            onClick={() => handleBallClick(index)}
+          >
+            <div
+              style={{
+                width: '50px',
+                height: '50px',
+                borderRadius: '50%',
+                backgroundColor: ballColors[index],
+              }}
+            />
+          </div>
+        ))}
       </div>
-      <hr className={styles.hr} />
-      <div>
-        <p>Component with state.</p>
-        <ClickCount />
-      </div>
-      <hr className={styles.hr} />
-      <div>
-        <p>
-          The button below will throw 2 errors. You'll see the error overlay to
-          let you know about the errors but it won't break the page or reset
-          your state.
-        </p>
-        <Button
-          onClick={(e) => {
-            setTimeout(() => document.parentNode(), 0)
-            throwError()
-          }}
-        >
-          Throw an Error
-        </Button>
-      </div>
-      <hr className={styles.hr} />
-    </main>
-  )
+    </div>
+  );
 }
 
-export default Home
+
+
+
+
