@@ -12,6 +12,7 @@ const colors = [
 
 export default function Home() {
   const [ballColors, setBallColors] = useState(Array(100).fill(colors[0]));
+  const [selectedPage, setSelectedPage] = useState('');
 
   const handleBallClick = (index) => {
     const nextColorIndex = (colors.indexOf(ballColors[index]) + 1) % colors.length;
@@ -19,22 +20,50 @@ export default function Home() {
     updatedColors[index] = colors[nextColorIndex];
     setBallColors(updatedColors);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('ballColors', JSON.stringify(updatedColors));
+      localStorage.setItem(`${selectedPage}BallColors`, JSON.stringify(updatedColors));
+    }
+  };
+
+  const resetColors = () => {
+    const resetColors = Array(100).fill(colors[0]);
+    setBallColors(resetColors);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`${selectedPage}BallColors`, JSON.stringify(resetColors));
+    }
+  };
+
+  const handleSelectChange = (event) => {
+    setSelectedPage(event.target.value);
+    if (typeof window !== 'undefined') {
+      const storedColors = localStorage.getItem(`${event.target.value}BallColors`);
+      if (storedColors) {
+        setBallColors(JSON.parse(storedColors));
+      } else {
+        resetColors();
+      }
     }
   };
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const storedColors = localStorage.getItem('ballColors');
+      const storedColors = localStorage.getItem(`${selectedPage}BallColors`);
       if (storedColors) {
         setBallColors(JSON.parse(storedColors));
       }
     }
-  }, []);
+  }, [selectedPage]);
 
   return (
     <div style={{ backgroundColor: '#333', color: '#fff', fontFamily: 'Montserrat, sans-serif' }}>
       <h1>Árvore da Vida</h1>
+      <button onClick={resetColors}>Resetar Cores</button>
+      <select value={selectedPage} onChange={handleSelectChange}>
+        <option value="">Selecione uma página</option>
+        <option value="page1">Página 1</option>
+        <option value="page2">Página 2</option>
+        <option value="page3">Página 3</option>
+        {/* Adicione mais opções conforme necessário */}
+      </select>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: '10px' }}>
         {Array.from({ length: 100 }).map((_, index) => (
           <div
@@ -65,7 +94,6 @@ export default function Home() {
     </div>
   );
 }
-
 
 
 
